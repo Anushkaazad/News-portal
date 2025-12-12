@@ -42,7 +42,14 @@
       "title": "Local Startup Wins Innovation Award",
       "body": "A Dhaka-based startup has won an international innovation award for AI-driven solutions...",
       "author_id": "2",
-      "comments": []
+      "comments": [
+        {
+          "id": 1,
+          "text": "excellent news",
+          "user_id": "2",
+          "timestamp": "2025-12-12T19:46:55.175Z"
+        }
+      ]
     },
     {
       "id": "0d0c",
