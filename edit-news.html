@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit News - News Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Edit News</h1>
+            <div class="user-info">
+                <span id="userGreeting">Logged in as: </span>
+                <a href="news-list.html" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+
+        <!-- Edit News Form -->
+        <div class="form-container">
+            <form id="editNewsForm">
+                <div class="form-group">
+                    <label for="newsTitle">News Title *</label>
+                    <input type="text" id="newsTitle" required placeholder="Enter news title">
+                </div>
+
+                <div class="form-group">
+                    <label for="newsBody">News Content * (minimum 20 characters)</label>
+                    <textarea id="newsBody" rows="10" required placeholder="Enter news content..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Update News</button>
+                    <a href="news-list.html" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        let loggedInUser = null;
+        let currentNews = null;
+
+        // Get news ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const newsId = urlParams.get('id');
+
+        // Check if user is logged in
+        window.addEventListener('DOMContentLoaded', async () => {
+            checkLogin();
+            if (!newsId) {
+                alert('Invalid news ID');
+                window.location.href = 'news-list.html';
+                return;
+            }
+            await loadNewsData();
+        });
+
+        // Check if user is logged in
+        function checkLogin() {
+            const userString = localStorage.getItem('loggedInUser');
+            if (!userString) {
+                window.location.href = 'index.html';
+                return;
+            }
+            loggedInUser = JSON.parse(userString);
+            document.getElementById('userGreeting').textContent = `Logged in as: ${loggedInUser.name}`;
+        }
+
+        // Load news data to edit
+        async function loadNewsData() {
+            try {
+                const response = await fetch(`${API_URL}/news/${newsId}`);
+                currentNews = await response.json();
+
+                // Check if logged-in user is the author
+                if (currentNews.author_id !== loggedInUser.id) {
+                    alert('You can only edit your own news!');
+                    window.location.href = 'news-list.html';
+                    return;
+                }
+
+                // Pre-fill the form with existing data
+                document.getElementById('newsTitle').value = currentNews.title;
+                document.getElementById('newsBody').value = currentNews.body;
+            } catch (error) {
+                alert('Error loading news data.');
+                console.error('Error:', error);
+                window.location.href = 'news-list.html';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('editNewsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('newsTitle').value.trim();
+            const body = document.getElementById('newsBody').value.trim();
+
+            // Validation
+            if (!title) {
+                alert('News title cannot be empty.');
+                return;
+            }
+
+            if (body.length < 20) {
+                alert('News content must be at least 20 characters.');
+                return;
+            }
+
+            try {
+                // Update news using PATCH
+                const response = await fetch(`${API_URL}/news/${newsId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        body: body
+                    })
+                });
+
+                if (response.ok) {
+                    alert('News updated successfully!');
+                    window.location.href = 'news-list.html';
+                } else {
+                    alert('Failed to update news.');
+                }
+            } catch (error) {
+                alert('Error updating news.');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

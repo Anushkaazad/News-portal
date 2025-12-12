@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create News - News Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Create News</h1>
+            <div class="user-info">
+                <span id="userGreeting">Logged in as: </span>
+                <a href="news-list.html" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+
+        <!-- Create News Form -->
+        <div class="form-container">
+            <form id="createNewsForm">
+                <div class="form-group">
+                    <label for="newsTitle">News Title *</label>
+                    <input type="text" id="newsTitle" required placeholder="Enter news title">
+                </div>
+
+                <div class="form-group">
+                    <label for="newsBody">News Content * (minimum 20 characters)</label>
+                    <textarea id="newsBody" rows="10" required placeholder="Enter news content..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create News</button>
+                    <a href="news-list.html" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        let loggedInUser = null;
+
+        // Check if user is logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+        });
+
+        // Check if user is logged in
+        function checkLogin() {
+            const userString = localStorage.getItem('loggedInUser');
+            if (!userString) {
+                window.location.href = 'index.html';
+                return;
+            }
+            loggedInUser = JSON.parse(userString);
+            document.getElementById('userGreeting').textContent = `Logged in as: ${loggedInUser.name}`;
+        }
+
+        // Handle form submission
+        document.getElementById('createNewsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('newsTitle').value.trim();
+            const body = document.getElementById('newsBody').value.trim();
+
+            // Validation
+            if (!title) {
+                alert('News title cannot be empty.');
+                return;
+            }
+
+            if (body.length < 20) {
+                alert('News content must be at least 20 characters.');
+                return;
+            }
+
+            try {
+                // Create news object
+                const newsData = {
+                    title: title,
+                    body: body,
+                    author_id: loggedInUser.id,
+                    comments: [] // Initialize with empty comments array
+                };
+
+                // POST request to create news
+                const response = await fetch(`${API_URL}/news`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newsData)
+                });
+
+                if (response.ok) {
+                    alert('News created successfully!');
+                    window.location.href = 'news-list.html';
+                } else {
+                    alert('Failed to create news.');
+                }
+            } catch (error) {
+                alert('Error creating news. Make sure JSON Server is running!');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

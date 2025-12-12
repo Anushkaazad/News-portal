@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Detail - News Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>News Portal</h1>
+            <div class="user-info">
+                <span id="userGreeting">Logged in as: </span>
+                <a href="news-list.html" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+
+        <!-- News Detail -->
+        <div id="newsDetail" class="news-detail">
+            <!-- News details will be loaded here -->
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h3>Comments</h3>
+            <div id="commentsList">
+                <!-- Comments will be loaded here -->
+            </div>
+
+            <!-- Add Comment Form -->
+            <div class="add-comment">
+                <h4>Add a Comment</h4>
+                <form id="commentForm">
+                    <textarea id="commentText" placeholder="Write your comment..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+        let loggedInUser = null;
+        let allUsers = [];
+        let currentNews = null;
+
+        // Get news ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const newsId = urlParams.get('id');
+
+        // Check if user is logged in
+        window.addEventListener('DOMContentLoaded', async () => {
+            checkLogin();
+            if (!newsId) {
+                alert('Invalid news ID');
+                window.location.href = 'news-list.html';
+                return;
+            }
+            await loadAllUsers();
+            await loadNewsDetail();
+        });
+
+        // Check if user is logged in
+        function checkLogin() {
+            const userString = localStorage.getItem('loggedInUser');
+            if (!userString) {
+                window.location.href = 'index.html';
+                return;
+            }
+            loggedInUser = JSON.parse(userString);
+            document.getElementById('userGreeting').textContent = `Logged in as: ${loggedInUser.name}`;
+        }
+
+        // Load all users
+        async function loadAllUsers() {
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                allUsers = await response.json();
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Get user name by ID
+        function getUserName(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            return user ? user.name : 'Unknown';
+        }
+
+        // Load news detail
+        async function loadNewsDetail() {
+            try {
+                const response = await fetch(`${API_URL}/news/${newsId}`);
+                currentNews = await response.json();
+
+                // Display news detail
+                const newsDetailDiv = document.getElementById('newsDetail');
+                const authorName = getUserName(currentNews.author_id);
+
+                newsDetailDiv.innerHTML = `
+                    <h2>${currentNews.title}</h2>
+                    <p class="author">By: ${authorName}</p>
+                    <div class="news-body">
+                        <p>${currentNews.body}</p>
+                    </div>
+                `;
+
+                // Display comments
+                displayComments();
+            } catch (error) {
+                alert('Error loading news detail.');
+                console.error('Error:', error);
+            }
+        }
+
+        // Display comments
+        function displayComments() {
+            const commentsListDiv = document.getElementById('commentsList');
+
+            if (!currentNews.comments || currentNews.comments.length === 0) {
+                commentsListDiv.innerHTML = '<p class="no-data">No comments yet. Be the first to comment!</p>';
+                return;
+            }
+
+            commentsListDiv.innerHTML = '';
+
+            currentNews.comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+                const commenterName = getUserName(comment.user_id);
+
+                commentDiv.innerHTML = `
+                    <p class="comment-author">${commenterName}</p>
+                    <p class="comment-text">${comment.text}</p>
+                    <p class="comment-time">${new Date(comment.timestamp).toLocaleString()}</p>
+                `;
+
+                commentsListDiv.appendChild(commentDiv);
+            });
+        }
+
+        // Handle comment form submission
+        document.getElementById('commentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const commentText = document.getElementById('commentText').value.trim();
+
+            if (!commentText) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            try {
+                // Create new comment object
+                const newComment = {
+                    id: currentNews.comments ? currentNews.comments.length + 1 : 1,
+                    text: commentText,
+                    user_id: loggedInUser.id,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Add comment to the news item's comments array
+                const updatedComments = currentNews.comments ? [...currentNews.comments, newComment] : [newComment];
+
+                // Update news with new comment using PATCH
+                const response = await fetch(`${API_URL}/news/${newsId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        comments: updatedComments
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Comment added successfully!');
+                    document.getElementById('commentText').value = ''; // Clear form
+                    await loadNewsDetail(); // Reload to show new comment
+                } else {
+                    alert('Failed to add comment.');
+                }
+            } catch (error) {
+                alert('Error adding comment.');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

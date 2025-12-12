@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - News Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h1>News Portal Login</h1>
+            <p>Select your name to login</p>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="userSelect">Choose User:</label>
+                    <select id="userSelect" required>
+                        <option value="">-- Select User --</option>
+                        <!-- Users will be loaded here from API -->
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // API URL for JSON Server
+        const API_URL = 'http://localhost:3000';
+
+        // When page loads, fetch all users from the API
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadUsers();
+        });
+
+        // Function to load users from API
+        async function loadUsers() {
+            try {
+                // Fetch users from /users endpoint
+                const response = await fetch(`${API_URL}/users`);
+                const users = await response.json();
+
+                // Get the select dropdown element
+                const userSelect = document.getElementById('userSelect');
+
+                // Add each user as an option in dropdown
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.name;
+                    userSelect.appendChild(option);
+                });
+            } catch (error) {
+                alert('Error loading users. Make sure JSON Server is running!');
+                console.error('Error:', error);
+            }
+        }
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent page reload
+
+            const userId = document.getElementById('userSelect').value;
+
+            if (!userId) {
+                alert('Please select a user');
+                return;
+            }
+
+            try {
+                // Fetch the selected user's details
+                const response = await fetch(`${API_URL}/users/${userId}`);
+                const user = await response.json();
+
+                // Save user info in browser's localStorage
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+
+                // Redirect to news list page
+                window.location.href = 'news-list.html';
+            } catch (error) {
+                alert('Login failed. Please try again.');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
