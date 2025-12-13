@@ -196,7 +196,7 @@
                 <div class="card-actions">
                     <a href="news-detail.html?id=${news.id}" class="btn btn-info">View Details</a>
                     ${isAuthor ? `<a href="edit-news.html?id=${news.id}" class="btn btn-warning">Edit</a>` : ''}
-                    ${isAuthor ? `<button onclick="deleteNews(${news.id})" class="btn btn-danger">Delete</button>` : ''}
+                    ${isAuthor ? `<button onclick="deleteNews('${news.id}')" class="btn btn-danger">Delete</button>` : ''}
                 </div>
             `;
 
@@ -216,7 +216,9 @@
 
                 if (response.ok) {
                     alert('News deleted successfully!');
-                    await loadNews(); // Reload the list
+                    setTimeout(async () => {
+                      await loadNews(); 
+                    }, 3000);
                 } else {
                     alert('Failed to delete news.');
                 }
