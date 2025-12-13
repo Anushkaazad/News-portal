@@ -18,26 +18,6 @@
   ],
   "news": [
     {
-      "id": "1",
-      "title": "Govt Announces New Tech Park",
-      "body": "A new state-of-the-art tech park will be established in Dhaka to boost the IT sector...",
-      "author_id": "1",
-      "comments": [
-        {
-          "id": 1,
-          "text": "Great initiative!",
-          "user_id": "2",
-          "timestamp": "2025-12-04T10:30:00Z"
-        },
-        {
-          "id": 2,
-          "text": "Hope this brings more jobs.",
-          "user_id": "3",
-          "timestamp": "2025-12-04T11:00:00Z"
-        }
-      ]
-    },
-    {
       "id": "2",
       "title": "Local Startup Wins Innovation Award",
       "body": "A Dhaka-based startup has won an international innovation award for AI-driven solutions...",
@@ -54,7 +34,7 @@
     {
       "id": "0d0c",
       "title": "Hic ea aut veniam m",
-      "body": "Enim sint recusandae",
+      "body": "Enim sint recusandae weertyuikig",
       "author_id": "1",
       "comments": []
     },
@@ -77,7 +57,14 @@
       "title": "Aut ducimus exceptu",
       "body": "Aute reiciendis omniff",
       "author_id": "1",
-      "comments": []
+      "comments": [
+        {
+          "id": 1,
+          "text": "can someone translate",
+          "user_id": "3",
+          "timestamp": "2025-12-13T17:48:22.262Z"
+        }
+      ]
     },
     {
       "id": "2af0",
@@ -99,6 +86,34 @@
       "body": "Ut ipsum eiusmod mod",
       "author_id": "1",
       "comments": []
+    },
+    {
+      "id": "cb32",
+      "title": "Local Community Rallies to Launch Eco-Friendly Initiative Amid Growing Climate Concerns",
+      "body": "Local residents gathered to launch a new eco-friendly initiative focused on reducing pollution and promoting sustainable habits.\nThe program includes tree planting, waste reduction, and environmental awareness activities.\nOrganizers say the effort was inspired by growing concerns about climate change.\nMore community events are planned to encourage long-term environmental responsibility.",
+      "author_id": "1",
+      "comments": [
+        {
+          "id": 1,
+          "text": "great initiative",
+          "user_id": "3",
+          "timestamp": "2025-12-13T17:50:11.352Z"
+        }
+      ]
+    },
+    {
+      "id": "8728",
+      "title": "“Stranger Things Season 5 Promises an Epic and Emotional Finale in Hawkins”",
+      "body": "Fans are eagerly awaiting *Stranger Things 5* as the final season promises a darker and more intense storyline.\nThe creators have hinted at emotional moments and major character arcs coming to a close.\nThe story will return to Hawkins for one last battle against the Upside Down.\nExcitement continues to grow as viewers prepare to say goodbye to the beloved series.",
+      "author_id": "2",
+      "comments": [
+        {
+          "id": 1,
+          "text": "super excited",
+          "user_id": "2",
+          "timestamp": "2025-12-13T17:16:14.242Z"
+        }
+      ]
     }
   ]
 }
